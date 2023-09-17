@@ -19,7 +19,7 @@ import com.indevsolutions.workshop.play.service.PlayService;
 @RequestMapping("/plays")
 public class PlayController {
 
-	private static final Long userId = 1L;
+	private static final Long USER_ID = 1L;
 
 	@Autowired
 	private PlayService playService;
@@ -29,13 +29,13 @@ public class PlayController {
 
 	@GetMapping
 	public List<PlaySummaryDTO> findLatestPlays() {
-		return playService.findLatestPlays(userId);
+		return playService.findLatestPlays(USER_ID);
 	}
 
 	@PostMapping
 	public Play  createPlay(@RequestBody PlayDTO playRequest) {
 		var play = modelMapper.map(playRequest, Play.class);
-		play.setUserId(userId);
+		play.setUserId(USER_ID);
 		return playService.createPlay(play);
 	}
 }
