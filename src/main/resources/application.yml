@@ -2,12 +2,12 @@ server:
    servlet:
       context-path: /workshop
    port: 9090
+   error:
+      include-message: always
 spring:
-   sql:
-      init:
-         mode: always
-         schema-locations: classpath:schema.sql
-         continue-on-error: true
+   flyway:
+      locations: classpath:db/migrations
+      defaultSchema: play_schema   
    datasource:
       url: jdbc:postgresql://localhost:5432/workshop
       username: postgres
@@ -20,8 +20,8 @@ spring:
       properties:
          hibernate:
             dialect: org.hibernate.dialect.PostgreSQLDialect
-            format_sql: true
-            default_schema: play_schema
+            '[format_sql]': true
+            '[default_schema]': play_schema
 services:
    bet:
-      url: http://customservicebet:8080/workshop/bets
+      url: http://localhost:8080/workshop/bets

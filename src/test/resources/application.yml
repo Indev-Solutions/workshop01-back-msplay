@@ -1,12 +1,12 @@
 server:
    servlet:
       context-path: /workshop
+   error:
+      include-message: always
 spring:
-   sql:
-      init:
-         mode: always
-         schema-locations: classpath:schema.sql
-         continue-on-error: true
+   flyway:
+      locations: classpath:db/migrations
+      defaultSchema: play_schema
    datasource:
       url: jdbc:h2:mem:workshop;DATABASE_TO_LOWER=TRUE
       username: postgres
