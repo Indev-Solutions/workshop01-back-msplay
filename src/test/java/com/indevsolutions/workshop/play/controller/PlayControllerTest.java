@@ -28,7 +28,7 @@ import com.indevsolutions.workshop.play.dto.shared.BetOptionDTO;
 import com.indevsolutions.workshop.play.service.BetService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PlayControllerTest {
+class PlayControllerTest {
 	
 	@Autowired
 	private PlayController playController;

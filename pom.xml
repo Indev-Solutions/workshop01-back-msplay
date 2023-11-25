@@ -25,9 +25,7 @@
 		<sonar.projectKey>workshop-play</sonar.projectKey>
 		<sonar.projectName>workshop play</sonar.projectName>
 		<sonar.host.url>http://localhost:9000</sonar.host.url>
-		<sonar.token>sqp_c8d5dc18a38421156763ba26c62ab0a07e0274e7</sonar.token>
   		<sonar.java.binaries>target</sonar.java.binaries>
-
 	</properties>
 	<dependencies>
 		<dependency>
