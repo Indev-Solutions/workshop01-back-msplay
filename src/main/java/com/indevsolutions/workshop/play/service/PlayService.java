@@ -1,5 +1,10 @@
 package com.indevsolutions.workshop.play.service;
 
+import static com.indevsolutions.workshop.play.service.Error.BET_CLOSED;
+import static com.indevsolutions.workshop.play.service.Error.BET_NOT_VALID;
+import static com.indevsolutions.workshop.play.service.Error.CHOICE_NOT_VALID;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,8 +14,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,14 +30,19 @@ public class PlayService {
 
 	private static final long MINUTES_BEFORE_CLOSE_BET = 10;
 
-	@Autowired
-	private PlayRepository playRepository;
+	private final PlayRepository playRepository;
+	private final BetService betService;
+	private final ModelMapper modelMapper;
+	private final MessageService messageService;
 
-	@Autowired
-	private BetService betService;
-
-	@Autowired
-	private ModelMapper modelMapper;
+	public PlayService(PlayRepository playRepository, BetService betService, ModelMapper modelMapper,
+			MessageService messageService) {
+		super();
+		this.playRepository = playRepository;
+		this.betService = betService;
+		this.modelMapper = modelMapper;
+		this.messageService = messageService;
+	}
 
 	public List<PlaySummaryDTO> findLatestPlays(Long userId) {
 		var plays = playRepository.findTop5ByUserIdOrderByRegistrationDateDesc(userId);
@@ -52,8 +60,7 @@ public class PlayService {
 				getBetOption(bet, p.getChoiceId()).map(o -> modelMapper.map(o, PlayChoiceDTO.class))
 						.ifPresent(play::setChoice);
 
-				getBetOption(bet, bet.getResultId()).map(BetOptionDTO::getDescription)
-						.ifPresent(play::setResult);
+				getBetOption(bet, bet.getResultId()).map(BetOptionDTO::getDescription).ifPresent(play::setResult);
 			}
 
 			return play;
@@ -72,20 +79,20 @@ public class PlayService {
 		var bet = betService.findBetsByIds(Set.of(play.getBetId()));
 
 		if (bet == null) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The betId is not valid.");
+			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(BET_NOT_VALID));
 		}
 
 		var isOptionValid = bet.stream().map(BetDTO::getOptions).flatMap(Set::stream)
 				.anyMatch(o -> o.getId().equals(play.getChoiceId()));
 		if (!isOptionValid) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The choiceId is not valid.");
+			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(CHOICE_NOT_VALID));
 		}
 
 		var now = LocalDateTime.now();
 		var duration = Duration.between(now, bet.get(0).getMatchDate());
 
 		if (duration.toMinutes() <= MINUTES_BEFORE_CLOSE_BET) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The bet is closed.");
+			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(BET_CLOSED));
 		}
 
 		play.setRegistrationDate(now);
