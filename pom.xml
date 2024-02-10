@@ -17,12 +17,15 @@
 	
 	<properties>
 		<java.version>17</java.version>
-		<modelmapper.version>3.0.0</modelmapper.version>
-		<sonar.exclusions>com/indevsolutions/workshop/play/domain/**/*, com/indevsolutions/workshop/play/dto/**/*, com/indevsolutions/workshop/play/service/BetService</sonar.exclusions>
+		<modelmapper.version>3.0.0</modelmapper.version>		
 		<jacoco.version>0.8.10</jacoco.version>
 		<spring-doc.version>2.3.0</spring-doc.version>
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.language>java</sonar.language>
+		<sonar.sources>src/main</sonar.sources>
+		<sonar.tests>src/test</sonar.tests>
+		<sonar.exclusions>src/main/java/com/indevsolutions/workshop/play/domain/**/*, src/main/java/com/indevsolutions/workshop/play/dto/**/*, src/main/java/com/indevsolutions/workshop/play/service/BetService</sonar.exclusions>
 		<sonar.projectKey>workshop-play</sonar.projectKey>
 		<sonar.projectName>workshop play</sonar.projectName>
 		<sonar.host.url>http://localhost:9000</sonar.host.url>
