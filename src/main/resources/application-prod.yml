@@ -24,4 +24,4 @@ spring:
             '[default_schema]': play_schema
 services:
    bet:
-      url: http://${SERVICE_BET_HOSTNAME}:8080/workshop/bets
+      url: http://${SERVICE_BET_HOSTNAME}/workshop/bets
