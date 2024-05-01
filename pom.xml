@@ -5,19 +5,31 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.3</version>
+		<version>3.1.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	
 	<groupId>com.indevsolutions.workshop</groupId>
 	<artifactId>workshop-play</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>workshop-play</name>
 	<description>Demo project for Spring Boot</description>
 	
 	<properties>
 		<java.version>17</java.version>
-		<modelmapper.version>3.0.0</modelmapper.version>
+		<modelmapper.version>3.0.0</modelmapper.version>		
+		<jacoco.version>0.8.10</jacoco.version>
+		<spring-doc.version>2.3.0</spring-doc.version>
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+		<sonar.language>java</sonar.language>
+		<sonar.sources>src/main</sonar.sources>
+		<sonar.tests>src/test</sonar.tests>
+		<sonar.exclusions>src/**/domain/**/*, src/**/dto/**/*, src/**/BetService.java</sonar.exclusions>
+		<sonar.projectKey>Indev-Solutions_workshop01-back-msplay</sonar.projectKey>
+		<sonar.organization>indev-solutions</sonar.organization> 
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+  		<sonar.java.binaries>target</sonar.java.binaries>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -62,6 +74,12 @@
 		</dependency>
 		
 		<dependency>
+		    <groupId>org.springdoc</groupId>
+		    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		    <version>${spring-doc.version}</version>
+		</dependency>
+
+		<dependency>
 	      <groupId>org.flywaydb</groupId>
 	      <artifactId>flyway-core</artifactId>
 	    </dependency>
@@ -95,7 +113,38 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				 <executions>
+	                <execution>
+	                    <goals>
+	                        <goal>repackage</goal>
+	                    </goals>
+	                </execution>
+	            </executions>
 			</plugin>
+			<plugin>
+			    <groupId>org.jacoco</groupId>
+			    <artifactId>jacoco-maven-plugin</artifactId>
+			    <version>${jacoco.version}</version>
+			    <executions>
+			        <execution>
+			          <id>prepare-agent</id>
+			          <goals>
+			            <goal>prepare-agent</goal>
+			          </goals>
+			        </execution>
+			        <execution>
+			          <id>report</id>
+			          <goals>
+			            <goal>report</goal>
+			          </goals>
+			          <configuration>
+			            <formats>
+			              <format>XML</format>
+			            </formats>
+			          </configuration>
+			        </execution>
+			      </executions>
+			    </plugin>
 		</plugins>
 	</build>
 
