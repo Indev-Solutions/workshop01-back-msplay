@@ -48,7 +48,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "The execution of backend pipeline 'Java CD (MSBET)' with GitHub Actions have finished"
+              "text": "The execution of backend pipeline 'Java CD (MSPLAY)' with GitHub Actions have finished"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
