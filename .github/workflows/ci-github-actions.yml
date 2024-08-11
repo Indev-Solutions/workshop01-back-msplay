@@ -56,3 +56,8 @@ jobs:
           context: .
           push: true
           tags: ${{ vars.DOCKERHUB_REPOSITORY }}/workshop1:ms-play_v${{ env.MAVEN_PROJECT_VERSION }}
+      - name: Deploy Maven package
+        run: mvn deploy -Dmaven.test.skip=true
+        env:
+          GITHUB_ACTOR: cnunezdp-indevsolutions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
