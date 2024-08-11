@@ -11,7 +11,7 @@
 	
 	<groupId>com.indevsolutions.workshop</groupId>
 	<artifactId>workshop-play</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<name>workshop-play</name>
 	<description>Demo project for Spring Boot</description>
 	
@@ -148,4 +148,11 @@
 		</plugins>
 	</build>
 
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub OWNER Apache Maven Packages</name>
+			<url>https://maven.pkg.github.com/Indev-Solutions/workshop01-back-msplay</url>
+		</repository>
+	</distributionManagement>
 </project>

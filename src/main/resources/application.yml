@@ -20,8 +20,8 @@ spring:
       properties:
          hibernate:
             dialect: org.hibernate.dialect.PostgreSQLDialect
-            '[format_sql]': true
-            '[default_schema]': play_schema
+            format_sql: true
+            default_schema: play_schema
 services:
    bet:
       url: http://localhost:8080/workshop/bets
