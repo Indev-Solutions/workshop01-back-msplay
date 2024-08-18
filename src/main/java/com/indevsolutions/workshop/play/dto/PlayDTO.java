@@ -2,8 +2,6 @@ package com.indevsolutions.workshop.play.dto;
 
 import java.math.BigDecimal;
 
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
 public class PlayDTO {
@@ -15,8 +13,6 @@ public class PlayDTO {
 	private Long choiceId;
 
 	@NotNull
-	@DecimalMin("10.00")
-	@DecimalMax("10000.00")
 	private BigDecimal amount;
 
 	public Long getBetId() {

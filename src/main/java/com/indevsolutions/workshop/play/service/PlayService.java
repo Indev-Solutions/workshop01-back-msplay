@@ -1,6 +1,7 @@
 package com.indevsolutions.workshop.play.service;
 
 import static com.indevsolutions.workshop.play.service.Error.BET_CLOSED;
+import static com.indevsolutions.workshop.play.service.Error.BET_NOT_VALID_MIN;
 import static com.indevsolutions.workshop.play.service.Error.BET_NOT_VALID;
 import static com.indevsolutions.workshop.play.service.Error.CHOICE_NOT_VALID;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -13,8 +14,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.indevsolutions.workshop.play.domain.Play;
@@ -76,20 +79,24 @@ public class PlayService {
 	}
 
 	public Play createPlay(Play play) {
-		var bet = betService.findBetsByIds(Set.of(play.getBetId()));
+		var bets = betService.findBetsByIds(Set.of(play.getBetId()));
 
-		if (bet == null) {
+		if (CollectionUtils.isEmpty(bets)) {
 			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(BET_NOT_VALID));
 		}
 
-		var isOptionValid = bet.stream().map(BetDTO::getOptions).flatMap(Set::stream)
-				.anyMatch(o -> o.getId().equals(play.getChoiceId()));
+		var bet = bets.get(0);
+		if (ObjectUtils.compare(bet.getMinAmount(), play.getAmount()) > 0) {
+			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(BET_NOT_VALID_MIN));
+		}
+
+		var isOptionValid = bet.getOptions().stream().anyMatch(o -> o.getId().equals(play.getChoiceId()));
 		if (!isOptionValid) {
 			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(CHOICE_NOT_VALID));
 		}
 
 		var now = LocalDateTime.now();
-		var duration = Duration.between(now, bet.get(0).getMatchDate());
+		var duration = Duration.between(now, bet.getMatchDate());
 
 		if (duration.toMinutes() <= MINUTES_BEFORE_CLOSE_BET) {
 			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(BET_CLOSED));
