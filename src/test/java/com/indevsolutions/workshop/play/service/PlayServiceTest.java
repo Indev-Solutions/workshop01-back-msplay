@@ -103,10 +103,11 @@ class PlayServiceTest {
 	}
 
 	@Test
-	void testCreatePlayWithInvalidAmount() {
+	void testCreatePlayWithInvalidMinAmount() {
+		String expectedMessage = "The amount is less than the allowed minimum amount.";
 		when(messageService.getMessage(any(Error.class))).thenAnswer(a -> {
 			if (a.getArgument(0) == Error.BET_NOT_VALID_MIN) {
-				return "The amount is less than the allowed minimum amount.";
+				return expectedMessage;
 			}
 			return "Error";
 		});
@@ -118,7 +119,28 @@ class PlayServiceTest {
 			playService.createPlay(play);
 		});
 
-		String expectedMessage = "The amount is less than the allowed minimum amount.";
+		String actualMessage = exception.getMessage();
+
+		assertTrue(actualMessage.contains(expectedMessage));
+	}
+
+	@Test
+	void testCreatePlayWithInvalidMaxAmount() {
+		String expectedMessage = "The amount is grater than the allowed maximum amount.";
+		when(messageService.getMessage(any(Error.class))).thenAnswer(a -> {
+			if (a.getArgument(0) == Error.BET_NOT_VALID_MAX) {
+				return expectedMessage;
+			}
+			return "Error";
+		});
+
+		var play = play(1l, 1l, 1l);
+		play.setAmount(new BigDecimal(1001));
+
+		Exception exception = assertThrows(ResponseStatusException.class, () -> {
+			playService.createPlay(play);
+		});
+
 		String actualMessage = exception.getMessage();
 
 		assertTrue(actualMessage.contains(expectedMessage));
@@ -131,6 +153,7 @@ class PlayServiceTest {
 		newBet.setMatchDate(tomorrow);
 		newBet.setLeagueId(1l);
 		newBet.setMinAmount(new BigDecimal(100));
+		newBet.setMaxAmount(new BigDecimal(1000));
 		newBet.setId(1l);
 
 		var option = new BetOptionDTO();

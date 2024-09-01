@@ -1,8 +1,9 @@
 package com.indevsolutions.workshop.play.service;
 
 import static com.indevsolutions.workshop.play.service.Error.BET_CLOSED;
-import static com.indevsolutions.workshop.play.service.Error.BET_NOT_VALID_MIN;
 import static com.indevsolutions.workshop.play.service.Error.BET_NOT_VALID;
+import static com.indevsolutions.workshop.play.service.Error.BET_NOT_VALID_MAX;
+import static com.indevsolutions.workshop.play.service.Error.BET_NOT_VALID_MIN;
 import static com.indevsolutions.workshop.play.service.Error.CHOICE_NOT_VALID;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -47,6 +48,12 @@ public class PlayService {
 		this.messageService = messageService;
 	}
 
+	/**
+	 * Returns the latest 5 plays.
+	 * 
+	 * @param userId
+	 * @return
+	 */
 	public List<PlaySummaryDTO> findLatestPlays(Long userId) {
 		var plays = playRepository.findTop5ByUserIdOrderByRegistrationDateDesc(userId);
 		var betIds = plays.stream().map(Play::getBetId).collect(Collectors.toSet());
@@ -70,6 +77,13 @@ public class PlayService {
 		}).toList();
 	}
 
+	/**
+	 * Returns the bet option based on the given id.
+	 * 
+	 * @param bet
+	 * @param id
+	 * @return
+	 */
 	private Optional<BetOptionDTO> getBetOption(BetDTO bet, Long id) {
 		if (id == null) {
 			return Optional.empty();
@@ -78,6 +92,12 @@ public class PlayService {
 		return bet.getOptions().stream().filter(o -> Objects.equals(o.getId(), id)).findFirst();
 	}
 
+	/**
+	 * Creates a play based on the given data.
+	 * 
+	 * @param play
+	 * @return
+	 */
 	public Play createPlay(Play play) {
 		var bets = betService.findBetsByIds(Set.of(play.getBetId()));
 
@@ -88,6 +108,10 @@ public class PlayService {
 		var bet = bets.get(0);
 		if (ObjectUtils.compare(bet.getMinAmount(), play.getAmount()) > 0) {
 			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(BET_NOT_VALID_MIN));
+		}
+
+		if (ObjectUtils.compare(bet.getMaxAmount(), play.getAmount(), true) < 0) {
+			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(BET_NOT_VALID_MAX));
 		}
 
 		var isOptionValid = bet.getOptions().stream().anyMatch(o -> o.getId().equals(play.getChoiceId()));

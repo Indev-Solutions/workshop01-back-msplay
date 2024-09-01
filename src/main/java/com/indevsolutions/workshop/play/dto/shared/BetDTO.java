@@ -13,6 +13,7 @@ public class BetDTO {
 	private Set<BetOptionDTO> options;
 	private Integer status;
 	private BigDecimal minAmount;
+	private BigDecimal maxAmount;
 	private Long leagueId;
 
 	public Long getId() {
@@ -77,6 +78,14 @@ public class BetDTO {
 
 	public void setMinAmount(BigDecimal minAmount) {
 		this.minAmount = minAmount;
+	}
+
+	public BigDecimal getMaxAmount() {
+		return maxAmount;
+	}
+
+	public void setMaxAmount(BigDecimal maxAmount) {
+		this.maxAmount = maxAmount;
 	}
 	
 }
