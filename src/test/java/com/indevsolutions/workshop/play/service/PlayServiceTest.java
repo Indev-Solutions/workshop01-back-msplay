@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -81,9 +82,9 @@ class PlayServiceTest {
 	}
 
 	@Test
-	void testCreatePlayWithWrongChoide() {
-		when(messageService.getMessage(any(Error.class))).thenAnswer(a-> {			
-			if(a.getArgument(0)== Error.CHOICE_NOT_VALID) {
+	void testCreatePlayWithWrongChoiceId() {
+		when(messageService.getMessage(any(Error.class))).thenAnswer(a -> {
+			if (a.getArgument(0) == Error.CHOICE_NOT_VALID) {
 				return "The choiceId is not valid.";
 			}
 			return "Error";
@@ -101,12 +102,58 @@ class PlayServiceTest {
 		assertTrue(actualMessage.contains(expectedMessage));
 	}
 
+	@Test
+	void testCreatePlayWithInvalidMinAmount() {
+		String expectedMessage = "The amount is less than the allowed minimum amount.";
+		when(messageService.getMessage(any(Error.class))).thenAnswer(a -> {
+			if (a.getArgument(0) == Error.BET_NOT_VALID_MIN) {
+				return expectedMessage;
+			}
+			return "Error";
+		});
+
+		var play = play(1l, 1l, 1l);
+		play.setAmount(new BigDecimal(99));
+
+		Exception exception = assertThrows(ResponseStatusException.class, () -> {
+			playService.createPlay(play);
+		});
+
+		String actualMessage = exception.getMessage();
+
+		assertTrue(actualMessage.contains(expectedMessage));
+	}
+
+	@Test
+	void testCreatePlayWithInvalidMaxAmount() {
+		String expectedMessage = "The amount is grater than the allowed maximum amount.";
+		when(messageService.getMessage(any(Error.class))).thenAnswer(a -> {
+			if (a.getArgument(0) == Error.BET_NOT_VALID_MAX) {
+				return expectedMessage;
+			}
+			return "Error";
+		});
+
+		var play = play(1l, 1l, 1l);
+		play.setAmount(new BigDecimal(1001));
+
+		Exception exception = assertThrows(ResponseStatusException.class, () -> {
+			playService.createPlay(play);
+		});
+
+		String actualMessage = exception.getMessage();
+
+		assertTrue(actualMessage.contains(expectedMessage));
+	}
+
 	private List<BetDTO> bet() {
 		var newBet = new BetDTO();
 
 		var tomorrow = LocalDateTime.now().plusDays(1);
 		newBet.setMatchDate(tomorrow);
 		newBet.setLeagueId(1l);
+		newBet.setMinAmount(new BigDecimal(100));
+		newBet.setMaxAmount(new BigDecimal(1000));
 		newBet.setId(1l);
 
 		var option = new BetOptionDTO();
@@ -127,7 +174,7 @@ class PlayServiceTest {
 		play.setBetId(betId);
 		play.setChoiceId(choiceId);
 		play.setUserId(userId);
-
+		play.setAmount(new BigDecimal(100));
 		return play;
 	}
 

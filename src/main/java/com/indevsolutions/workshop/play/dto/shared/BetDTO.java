@@ -1,5 +1,6 @@
 package com.indevsolutions.workshop.play.dto.shared;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -11,6 +12,8 @@ public class BetDTO {
 	private Long resultId;
 	private Set<BetOptionDTO> options;
 	private Integer status;
+	private BigDecimal minAmount;
+	private BigDecimal maxAmount;
 	private Long leagueId;
 
 	public Long getId() {
@@ -67,6 +70,22 @@ public class BetDTO {
 
 	public void setLeagueId(Long leagueId) {
 		this.leagueId = leagueId;
+	}
+
+	public BigDecimal getMinAmount() {
+		return minAmount;
+	}
+
+	public void setMinAmount(BigDecimal minAmount) {
+		this.minAmount = minAmount;
+	}
+
+	public BigDecimal getMaxAmount() {
+		return maxAmount;
+	}
+
+	public void setMaxAmount(BigDecimal maxAmount) {
+		this.maxAmount = maxAmount;
 	}
 	
 }
