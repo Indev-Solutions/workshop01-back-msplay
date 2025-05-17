@@ -16,6 +16,28 @@ This project focuses on providing the tools for users to interact with the betti
 * Docker
 * Docker Compose
 
+## Project Structure
+
+	.
+	├── deploy               				# Contains resources used during deployment.
+	├── src                  				# Source files
+	│   ├── main					
+	│   │	 ├── java			          		# Standard location for the **main source code**.
+	│   │	 ├── resources       				# This directory holds the resource files that the application needs to run
+	│   │	 │	  ├── db       		
+	│   │	 │	  │	  ├── migrations  		# Flyway migration files
+	│   │	 │	  ├── messages.properties	# This file contains the default internationalization (i18n) messages for the application.
+	│   ├── test          		
+	│   │	 ├── java          				# This directory is dedicated to the **source code for the automated tests****.
+	│   │	 ├── resources       				# Load and stress test
+	│   │	 │	  ├── db       		
+	│   │	 │	  │	  ├── migrations  		# flyway migration files for test purposes.
+	├── Dockerfile
+	├── docker-compose.ym
+	├── pom.xm
+
+	└── README.m
+
 ## Setup
 
 1.  **Clone the repository:**
@@ -23,6 +45,7 @@ This project focuses on providing the tools for users to interact with the betti
     ```bash
     git clone git@github.com:Indev-Solutions/workshop01-back-msplay.git
     cd workshop01-back-msplay
+    git checkout develop
     ```
 
 2.  **Build the Spring Boot application:**
