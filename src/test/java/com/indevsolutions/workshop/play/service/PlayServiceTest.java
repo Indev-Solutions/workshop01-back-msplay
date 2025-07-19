@@ -45,7 +45,7 @@ class PlayServiceTest {
 	public PlayService playService;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		when(betService.findBetsByIds(anySet())).thenReturn(bet());
 		ReflectionTestUtils.setField(playService, "modelMapper", new ModelMapper());
 	}
