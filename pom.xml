@@ -12,7 +12,7 @@
 
 	<groupId>com.indevsolutions.workshop</groupId>
 	<artifactId>workshop-play</artifactId>
-	<version>0.0.9</version>
+	<version>0.0.10</version>
 	<name>workshop-play</name>
 	<description>Demo project for Spring Boot</description>
 
