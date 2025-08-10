@@ -2,6 +2,8 @@ package com.indevsolutions.workshop.play.service;
 
 import static com.indevsolutions.workshop.play.service.Error.BET_CLOSED;
 import static com.indevsolutions.workshop.play.service.Error.BET_NOT_VALID;
+import static com.indevsolutions.workshop.play.service.Error.BET_NOT_VALID_MAX;
+import static com.indevsolutions.workshop.play.service.Error.BET_NOT_VALID_MIN;
 import static com.indevsolutions.workshop.play.service.Error.CHOICE_NOT_VALID;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -13,8 +15,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.indevsolutions.workshop.play.domain.Play;
@@ -44,6 +48,12 @@ public class PlayService {
 		this.messageService = messageService;
 	}
 
+	/**
+	 * Returns the latest 5 plays.
+	 * 
+	 * @param userId
+	 * @return
+	 */
 	public List<PlaySummaryDTO> findLatestPlays(Long userId) {
 		var plays = playRepository.findTop5ByUserIdOrderByRegistrationDateDesc(userId);
 		var betIds = plays.stream().map(Play::getBetId).collect(Collectors.toSet());
@@ -67,6 +77,13 @@ public class PlayService {
 		}).toList();
 	}
 
+	/**
+	 * Returns the bet option based on the given id.
+	 * 
+	 * @param bet
+	 * @param id
+	 * @return
+	 */
 	private Optional<BetOptionDTO> getBetOption(BetDTO bet, Long id) {
 		if (id == null) {
 			return Optional.empty();
@@ -75,21 +92,35 @@ public class PlayService {
 		return bet.getOptions().stream().filter(o -> Objects.equals(o.getId(), id)).findFirst();
 	}
 
+	/**
+	 * Creates a play based on the given data.
+	 * 
+	 * @param play
+	 * @return
+	 */
 	public Play createPlay(Play play) {
-		var bet = betService.findBetsByIds(Set.of(play.getBetId()));
+		var bets = betService.findBetsByIds(Set.of(play.getBetId()));
 
-		if (bet == null) {
+		if (CollectionUtils.isEmpty(bets)) {
 			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(BET_NOT_VALID));
 		}
 
-		var isOptionValid = bet.stream().map(BetDTO::getOptions).flatMap(Set::stream)
-				.anyMatch(o -> o.getId().equals(play.getChoiceId()));
+		var bet = bets.get(0);
+		if (ObjectUtils.compare(bet.getMinAmount(), play.getAmount()) > 0) {
+			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(BET_NOT_VALID_MIN));
+		}
+
+		if (ObjectUtils.compare(bet.getMaxAmount(), play.getAmount(), true) < 0) {
+			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(BET_NOT_VALID_MAX));
+		}
+
+		var isOptionValid = bet.getOptions().stream().anyMatch(o -> o.getId().equals(play.getChoiceId()));
 		if (!isOptionValid) {
 			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(CHOICE_NOT_VALID));
 		}
 
 		var now = LocalDateTime.now();
-		var duration = Duration.between(now, bet.get(0).getMatchDate());
+		var duration = Duration.between(now, bet.getMatchDate());
 
 		if (duration.toMinutes() <= MINUTES_BEFORE_CLOSE_BET) {
 			throw new ResponseStatusException(BAD_REQUEST, messageService.getMessage(BET_CLOSED));

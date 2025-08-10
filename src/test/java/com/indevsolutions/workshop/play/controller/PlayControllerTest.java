@@ -14,11 +14,11 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.indevsolutions.workshop.play.domain.Play;
 import com.indevsolutions.workshop.play.dto.PlayDTO;
@@ -29,12 +29,12 @@ import com.indevsolutions.workshop.play.service.BetService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PlayControllerTest {
-	
+
 	@Autowired
 	private PlayController playController;
-	
-	@MockBean
-    BetService betService;
+
+	@MockitoBean
+	BetService betService;
 
 	@LocalServerPort
 	private int port;
@@ -46,25 +46,26 @@ class PlayControllerTest {
 	void index() {
 		assertThat(playController).isNotNull();
 	}
-	
+
 	@Test
 	void testFindLatestPlays() {
-        when(betService.findBetsByIds(anySet())).thenReturn(List.of());
+		when(betService.findBetsByIds(anySet())).thenReturn(List.of());
 
 		var playsResponse = restTemplate.exchange("http://localhost:" + port + "/workshop/plays", HttpMethod.GET, null,
 				new ParameterizedTypeReference<List<PlaySummaryDTO>>() {
 				});
+
 		assertNotNull(playsResponse);
 
 		var plays = playsResponse.getBody();
 		assertNotNull(plays);
 		assertEquals(0, plays.size());
-		
+
 	}
-	
+
 	@Test
 	void testCreatePlay() {
-		
+
 		var bet = new BetDTO();
 		bet.setId(1L);
 		bet.setLeagueId(1L);
@@ -73,18 +74,18 @@ class PlayControllerTest {
 		var option = new BetOptionDTO();
 		option.setId(1L);
 		bet.setOptions(Set.of(option));
-		
-        when(betService.findBetsByIds(anySet())).thenReturn(List.of(bet));
 
-        var request = new PlayDTO();
-        request.setAmount(new BigDecimal(100));
-        request.setBetId(1l);
-        request.setChoiceId(1l);
-		
+		when(betService.findBetsByIds(anySet())).thenReturn(List.of(bet));
+
+		var request = new PlayDTO();
+		request.setAmount(new BigDecimal(100));
+		request.setBetId(1l);
+		request.setChoiceId(1l);
+
 		var play = restTemplate.postForObject("http://localhost:" + port + "/workshop/plays", request, Play.class);
 
 		assertNotNull(play);
-		
+
 	}
 
 }
